@@ -10,8 +10,8 @@ class User(Base):
     id = Column(Integer,primary_key=True,index=True)
     username = Column(String(255),unique=True,nullable=False,index=True)
     email = Column(String(255),unique=True,nullable=False,index=True)
-    hashed_password = Column(String(255),nullable=False)
-    is_active = Column(Boolean,server_default=("True"))
+    password = Column(String(255),nullable=False)
+    is_active = Column(Boolean,server_default=("False"))
     is_superuser = Column(Boolean,server_default=("False"))
     created_at = Column(TIMESTAMP(timezone=True),server_default=text('now()'))
 
