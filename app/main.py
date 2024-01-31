@@ -1,12 +1,12 @@
 from fastapi import FastAPI,APIRouter
 from . import schemas,utils
 from .database import get_db
-from .routers import accounts
+from .routers import accounts,posts
 app = FastAPI()
 
 
 app.include_router(accounts.router)
-
+app.include_router(posts.router)
 
 
 @app.get("/")

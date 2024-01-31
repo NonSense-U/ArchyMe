@@ -2,6 +2,9 @@ from pydantic import BaseModel,EmailStr
 from datetime import datetime
 
 
+#! Users Schemas
+
+
 class Private_UserInfo(BaseModel):
     id : int
     username : str
@@ -21,4 +24,26 @@ class UserCreate(BaseModel):
     password : str
 
 class UserUpdate(UserCreate):
+    pass
+
+
+
+#! Posts Schemas
+
+class raw_post_info(BaseModel):
+    id : int
+    title : str
+    content : str
+    created_at : datetime
+    publiched : bool
+
+
+class create_post(BaseModel):
+    title : str
+    content : str
+    publiched : bool
+
+
+class post_out(create_post):
+    owner : Public_UserInfo
     pass
