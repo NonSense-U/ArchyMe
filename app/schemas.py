@@ -47,3 +47,18 @@ class create_post(BaseModel):
 class post_out(create_post):
     owner : Public_UserInfo
     pass
+
+
+
+
+
+#! Auth scemas
+
+class user_login_credentials(BaseModel):
+    email : EmailStr
+    password : str
+
+
+class token_data(BaseModel):
+    username : str
+    user_id : int
