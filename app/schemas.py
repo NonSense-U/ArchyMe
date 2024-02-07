@@ -24,8 +24,9 @@ class UserCreate(BaseModel):
     password : str
 
 class UserUpdate(UserCreate):
-    pass
-
+    email : EmailStr = None
+    username : str = None
+    password : str = None
 
 
 #! Posts Schemas
@@ -48,7 +49,10 @@ class post_out(create_post):
     owner : Public_UserInfo
     pass
 
-
+class post_update(create_post):
+    title : str = None
+    content : str = None
+    publiched : bool = None
 
 
 

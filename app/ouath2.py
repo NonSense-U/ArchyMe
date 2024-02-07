@@ -21,7 +21,8 @@ def Create_Access_Token(data:dict):
 
 def verify_access_token(token:str, credentials_exception):
     try:
-        payload = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        
+        payload = jwt.decode(token,SECRET_KEY,algorithms=ALGORITHM)
         
         id : str = payload.get("user_id")
 

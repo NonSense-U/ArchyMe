@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter,Depends,status,HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
-from .. import models,schemas,utils
+from .. import models,schemas,utils,ouath2
 from typing import List
 
 
@@ -41,7 +41,7 @@ def update_user(id:int,user:schemas.UserUpdate,db:Session = Depends(get_db)):
     if user_to_update==None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     for key in user.model_dump().keys():
-        if user.model_dump()[key]!="":
+        if user.model_dump()[key]!=None:
             if key=="password":
                 user.password = utils.hash_password(user.password)
                 setattr(user_to_update,key,user.model_dump()[key])
@@ -54,10 +54,14 @@ def update_user(id:int,user:schemas.UserUpdate,db:Session = Depends(get_db)):
 
 
 @router.delete("/{id}",status_code=status.HTTP_202_ACCEPTED)
-def delete_user(id:int,db:Session = Depends(get_db)):
-    user_to_delete = db.query(models.User).filter(models.User.id==id)
-    if user_to_delete.first()==None:
+def delete_user(id:int,db:Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+    delete_query = db.query(models.User).filter(models.User.id==id)
+    user_to_delete = delete_query.first()
+
+    if user_to_delete==None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    user_to_delete.delete()
+    if user_to_delete.id != Token_Info.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    delete_query.delete()
     db.commit()
     return{"data":"success!"}
