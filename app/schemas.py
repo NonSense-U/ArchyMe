@@ -66,3 +66,17 @@ class user_login_credentials(BaseModel):
 class token_data(BaseModel):
     username : str
     user_id : int
+
+
+
+
+    ##! Follow system
+
+
+
+class followers_out(BaseModel):
+    follower : Public_UserInfo
+
+
+class followings_out(BaseModel):
+    followed : Public_UserInfo

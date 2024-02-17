@@ -24,3 +24,11 @@ class Post(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey('users.id',ondelete=("CASCADE")))
     owner = relationship("User")
+
+
+class Followings(Base):
+    __tablename__ = "followings"
+    follower_id = Column(Integer, ForeignKey('users.id',ondelete=("CASCADE")),primary_key=True)
+    followed_id = Column(Integer, ForeignKey('users.id',ondelete=("CASCADE")),primary_key=True)
+    follower = relationship("User",foreign_keys=[follower_id])
+    followed = relationship("User",foreign_keys=[followed_id])
