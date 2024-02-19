@@ -32,3 +32,20 @@ class Followings(Base):
     followed_id = Column(Integer, ForeignKey('users.id',ondelete=("CASCADE")),primary_key=True)
     follower = relationship("User",foreign_keys=[follower_id])
     followed = relationship("User",foreign_keys=[followed_id])
+
+
+class Ups(Base):
+    __tablename__ = "Ups"
+    user_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False,primary_key=True)
+    post_id = Column(Integer,ForeignKey("posts.id",ondelete="CASCADE"))
+    user = relationship("User",foreign_keys=[user_id])
+    post = relationship("Post",foreign_keys=[post_id])
+
+
+class Downs(Base):
+    __tablename__ = "Downs"
+    user_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False,primary_key=True)
+    post_id = Column(Integer,ForeignKey("posts.id",ondelete="CASCADE"),nullable=False,primary_key=True)
+    user = relationship("User",foreign_keys=[user_id])
+    post = relationship("Post",foreign_keys=[post_id])
+

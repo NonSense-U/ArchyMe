@@ -1,17 +1,26 @@
 from fastapi import FastAPI,APIRouter,Depends,HTTPException,status
+from sqlalchemy.sql import func
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models,schemas,ouath2
+from..utils import Count_Ups,Count_Downs
 from typing import List
 
 
 router = APIRouter(prefix="/posts",tags=["posts"])
 
-@router.get("/",response_model=List[schemas.raw_post_info])
+@router.get("/",response_model=List[schemas.post_out])
 def get_post(db : Session = Depends(get_db)):
-    query = db.query(models.Post)
-    return query.all()
-
+    
+    posts = db.query(models.Post, func.count(models.Ups.post_id).label("Ups"), func.count(models.Downs.post_id).label("Downs")).outerjoin(models.Ups, models.Post.id == models.Ups.post_id).outerjoin(models.Downs, models.Post.id == models.Downs.post_id).group_by(models.Post.id).all()
+    res_posts = []
+    for post,Up,Down in posts:
+        res_posts.append({
+            "post": post,
+            "Ups" : Up,
+            "Downs": Down
+        })
+    return res_posts
 
 @router.get('/{id}',response_model=schemas.post_out)
 def get_post_by_id(id : int,db : Session = Depends(get_db)):
@@ -19,7 +28,8 @@ def get_post_by_id(id : int,db : Session = Depends(get_db)):
     post = query.first()
     if post is None or post.publiched is False:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return post
+    result = {"post":post,"Ups":Count_Ups(id,db),"Downs" : Count_Downs(id,db)}
+    return result
 
 
 @router.post("/",response_model=schemas.post_out)
@@ -29,11 +39,12 @@ def create_post(post_info : schemas.create_post,db : Session = Depends(get_db),T
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return new_post
+    res = {"post":new_post,"Ups":0,"Downs":0}
+    return res
 
 
 
-@router.put('/{id}',response_model=schemas.post_out)
+@router.put('/{id}',response_model=schemas.post_update)
 def update_post(id : int,upodate_info : schemas.post_update,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
     update_query = db.query(models.Post).filter(models.Post.id==id)
     post_to_update = update_query.first()

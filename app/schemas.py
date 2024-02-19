@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel,EmailStr
 from datetime import datetime
 
@@ -35,6 +36,8 @@ class raw_post_info(BaseModel):
     id : int
     title : str
     content : str
+    Ups : int
+    Downs : int
     created_at : datetime
     publiched : bool
 
@@ -45,9 +48,16 @@ class create_post(BaseModel):
     publiched : bool
 
 
-class post_out(create_post):
+class Post(create_post):
+    id : int
     owner : Public_UserInfo
     pass
+
+
+class post_out(BaseModel):
+    post : Post
+    Ups : Optional[int] = None
+    Downs : Optional[int] = None
 
 class post_update(create_post):
     title : str = None
@@ -64,7 +74,7 @@ class user_login_credentials(BaseModel):
 
 
 class token_data(BaseModel):
-    username : str
+    username : str 
     user_id : int
 
 
@@ -80,3 +90,19 @@ class followers_out(BaseModel):
 
 class followings_out(BaseModel):
     followed : Public_UserInfo
+
+
+
+    ##! Reactions system
+
+
+class reaction(BaseModel):
+    user_id : int
+    user : Public_UserInfo
+    post_id : int
+    post : Post
+
+
+class react(BaseModel):
+    user : Public_UserInfo
+    post : Post
