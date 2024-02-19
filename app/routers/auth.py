@@ -11,7 +11,7 @@ router = APIRouter(prefix="/login",tags=["Auth"])
 
 @router.get("/",status_code=status.HTTP_200_OK)
 
-def login(user_credentials : schemas.user_login_credentials,db : Session = Depends(get_db)):
+def login(user_credentials : schemas.User_login_credentials,db : Session = Depends(get_db)):
 
     user = db.query(models.User).filter(models.User.email==user_credentials.email).first()  
 

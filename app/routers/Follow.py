@@ -5,7 +5,7 @@ from.. import models,schemas,utils,ouath2
 from typing import List
 
 
-router = APIRouter(tags=["Follwing"])
+router = APIRouter(tags=["Follow"])
 
 
 @router.get("/follow")
@@ -15,7 +15,7 @@ def get_follow(db: Session = Depends(get_db)):
 
 
 @router.post("/follow/{id}",status_code=status.HTTP_201_CREATED)
-def follow(id : int ,db: Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+def follow(id : int ,db: Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     follow_exist = db.query(models.Followings).filter(models.Followings.follower_id==Token_Info.user_id).filter(models.Followings.followed_id==id).first()
     if follow_exist!=None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT)
@@ -28,7 +28,7 @@ def follow(id : int ,db: Session = Depends(get_db),Token_Info : schemas.token_da
 
 
 @router.post("/unfollow/{id}")
-def unfollow(id:int,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+def unfollow(id:int,db : Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     unfollow_query = db.query(models.Followings).filter(models.Followings.follower_id==Token_Info.user_id).filter(models.Followings.followed_id==id)
 
     if unfollow_query.first() is None : 
@@ -38,14 +38,14 @@ def unfollow(id:int,db : Session = Depends(get_db),Token_Info : schemas.token_da
     return{"Data":"Unfollowed Successfully!"}
 
 
-@router.get("/followers/{id}",response_model=List[schemas.followers_out])
-def get_followers(id : int,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+@router.get("/followers/{id}",response_model=List[schemas.Followers_out])
+def get_followers(id : int,db : Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     followers_query = db.query(models.Followings).filter(models.Followings.followed_id==id)
     return followers_query.all()
 
 
 
-@router.get("/followings/{id}",response_model=List[schemas.followings_out])
-def get_followings(id : int,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+@router.get("/followings/{id}",response_model=List[schemas.Followings_out])
+def get_followings(id : int,db : Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     followings_query = db.query(models.Followings).filter(models.Followings.follower_id==id)
     return followings_query.all()

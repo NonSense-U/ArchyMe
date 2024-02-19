@@ -36,7 +36,9 @@ def get_user(id:int,db:Session = Depends(get_db)):
 
 
 @router.put("/{id}",status_code=status.HTTP_202_ACCEPTED,response_model=schemas.Public_UserInfo)
-def update_user(id:int,user:schemas.UserUpdate,db:Session = Depends(get_db)):
+def update_user(id:int,user:schemas.UserUpdate,db:Session = Depends(get_db),Token_info : schemas.Token_data = Depends(ouath2.get_current_user)):
+    if id != Token_info.user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     query = db.query(models.User).filter(models.User.id==id)
     user_to_update = query.first()
     if user_to_update==None:
@@ -55,7 +57,7 @@ def update_user(id:int,user:schemas.UserUpdate,db:Session = Depends(get_db)):
 
 
 @router.delete("/{id}",status_code=status.HTTP_202_ACCEPTED)
-def delete_user(id:int,db:Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+def delete_user(id:int,db:Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     delete_query = db.query(models.User).filter(models.User.id==id)
     user_to_delete = delete_query.first()
 

@@ -9,7 +9,7 @@ from typing import List
 
 router = APIRouter(prefix="/posts",tags=["posts"])
 
-@router.get("/",response_model=List[schemas.post_out])
+@router.get("/",response_model=List[schemas.Post_out])
 def get_post(db : Session = Depends(get_db)):
     
     posts = db.query(models.Post, func.count(models.Ups.post_id).label("Ups"), func.count(models.Downs.post_id).label("Downs")).outerjoin(models.Ups, models.Post.id == models.Ups.post_id).outerjoin(models.Downs, models.Post.id == models.Downs.post_id).group_by(models.Post.id).all()
@@ -22,7 +22,7 @@ def get_post(db : Session = Depends(get_db)):
         })
     return res_posts
 
-@router.get('/{id}',response_model=schemas.post_out)
+@router.get('/{id}',response_model=schemas.Post_out)
 def get_post_by_id(id : int,db : Session = Depends(get_db)):
     query = db.query(models.Post).filter(models.Post.id==id)
     post = query.first()
@@ -32,8 +32,8 @@ def get_post_by_id(id : int,db : Session = Depends(get_db)):
     return result
 
 
-@router.post("/",response_model=schemas.post_out)
-def create_post(post_info : schemas.create_post,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+@router.post("/",response_model=schemas.Post_out)
+def create_post(post_info : schemas.Create_post,db : Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     new_post = models.Post(**post_info.model_dump())
     new_post.owner_id  = Token_Info.user_id
     db.add(new_post)
@@ -44,8 +44,8 @@ def create_post(post_info : schemas.create_post,db : Session = Depends(get_db),T
 
 
 
-@router.put('/{id}',response_model=schemas.post_update)
-def update_post(id : int,upodate_info : schemas.post_update,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+@router.put('/{id}',response_model=schemas.Post_update)
+def update_post(id : int,upodate_info : schemas.Post_update,db : Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     update_query = db.query(models.Post).filter(models.Post.id==id)
     post_to_update = update_query.first()
     if post_to_update is None:
@@ -61,7 +61,7 @@ def update_post(id : int,upodate_info : schemas.post_update,db : Session = Depen
     
 
 @router.delete('/{id}',status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id : int,db : Session = Depends(get_db),Token_Info : schemas.token_data = Depends(ouath2.get_current_user)):
+def delete_post(id : int,db : Session = Depends(get_db),Token_Info : schemas.Token_data = Depends(ouath2.get_current_user)):
     delete_query = db.query(models.Post).filter(models.Post.id==id)
     post_to_delete = delete_query.first()
     if post_to_delete is None:

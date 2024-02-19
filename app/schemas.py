@@ -32,7 +32,7 @@ class UserUpdate(UserCreate):
 
 #! Posts Schemas
 
-class raw_post_info(BaseModel):
+class Raw_post_info(BaseModel):
     id : int
     title : str
     content : str
@@ -41,25 +41,31 @@ class raw_post_info(BaseModel):
     created_at : datetime
     publiched : bool
 
-
-class create_post(BaseModel):
+class Post_base(BaseModel):
     title : str
     content : str
     publiched : bool
 
 
-class Post(create_post):
-    id : int
-    owner : Public_UserInfo
+class Create_post(Post_base):
     pass
 
 
-class post_out(BaseModel):
-    post : Post
-    Ups : Optional[int] = None
-    Downs : Optional[int] = None
+class Post(Post_base):
+    id : int
+    owner : Public_UserInfo
+    pass
+    created_at : datetime
 
-class post_update(create_post):
+
+class Post_out(BaseModel):
+    post : Post
+    Ups : int
+    Downs : int
+
+
+
+class Post_update(Create_post):
     title : str = None
     content : str = None
     publiched : bool = None
@@ -68,12 +74,12 @@ class post_update(create_post):
 
 #! Auth scemas
 
-class user_login_credentials(BaseModel):
+class User_login_credentials(BaseModel):
     email : EmailStr
     password : str
 
 
-class token_data(BaseModel):
+class Token_data(BaseModel):
     username : str 
     user_id : int
 
@@ -84,11 +90,11 @@ class token_data(BaseModel):
 
 
 
-class followers_out(BaseModel):
+class Followers_out(BaseModel):
     follower : Public_UserInfo
 
 
-class followings_out(BaseModel):
+class Followings_out(BaseModel):
     followed : Public_UserInfo
 
 
@@ -96,13 +102,13 @@ class followings_out(BaseModel):
     ##! Reactions system
 
 
-class reaction(BaseModel):
+class Reaction(BaseModel):
     user_id : int
     user : Public_UserInfo
     post_id : int
     post : Post
 
 
-class react(BaseModel):
+class Reaction_out(BaseModel):
     user : Public_UserInfo
     post : Post
