@@ -112,3 +112,7 @@ class Reaction(BaseModel):
 class Reaction_out(BaseModel):
     user : Public_UserInfo
     post : Post
+
+    ##! Notifications
+class Notification_out(BaseModel):
+    message  : str
