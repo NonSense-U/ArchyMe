@@ -27,9 +27,9 @@ def verify_access_token(token:str, credentials_exception):
         id : int = payload.get("user_id")
 
         name:str = payload.get("username")
-
-        if name is None or id is None:
-            raise credentials_exception
+        #! Not needed, automaticly done by jwt.decode
+        # if name is None or id is None:
+        #     raise credentials_exception
         token_data = schemas.Token_data(user_id= id ,username=name)
     except JWTError:
         raise credentials_exception
