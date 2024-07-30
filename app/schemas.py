@@ -39,12 +39,12 @@ class Raw_post_info(BaseModel):
     Ups : int
     Downs : int
     created_at : datetime
-    publiched : bool
+    published : bool
 
 class Post_base(BaseModel):
     title : str
     content : str
-    publiched : bool
+    published : bool
 
 
 class Create_post(Post_base):
@@ -68,7 +68,7 @@ class Post_out(BaseModel):
 class Post_update(Create_post):
     title : str = None
     content : str = None
-    publiched : bool = None
+    published : bool = None
 
 
 

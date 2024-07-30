@@ -20,7 +20,7 @@ class Post(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255),nullable=False)
     content = Column(String(255),nullable=False)
-    publiched = Column(Boolean, server_default=("True"))
+    published = Column(Boolean, server_default=("True"))
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey('users.id',ondelete=("CASCADE")))
     owner = relationship("User")

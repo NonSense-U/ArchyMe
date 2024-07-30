@@ -14,16 +14,10 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 
 @router.get("/", response_model=List[schemas.Post_out])
 def get_post(skip: int = 0, limit: int | None = None ,db: Session = Depends(get_db)):
-    
     try:
         posts = db.query(models.Post, func.count(models.Ups.post_id).label("Ups"), func.count(models.Downs.post_id).label("Downs")).outerjoin(models.Ups, models.Post.id == models.Ups.post_id).outerjoin(models.Downs, models.Post.id == models.Downs.post_id).group_by(models.Post.id).offset(skip).limit(limit).all()
-        res_posts = []
-        for post, Up, Down in posts:
-            res_posts.append({
-                "post": post,
-                "Ups": Up,
-                "Downs": Down
-            })
+        #! mapping to match the schema
+        res_posts = list(map(lambda x: {"post": x[0], "Ups": x[1], "Downs": x[2]}, posts))           
         return res_posts
     except Exception as e:
         logger.error(f"Error getting posts: {e}")
@@ -35,10 +29,13 @@ def get_post_by_id(id: int, db: Session = Depends(get_db)):
     try:
         query = db.query(models.Post).filter(models.Post.id == id)
         post = query.first()
-        if post is None or post.publiched is False:
+        if post is None or post.published is False:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         result = {"post": post, "Ups": Count_Ups(id, db), "Downs": Count_Downs(id, db)}
         return result
+    #! WAS REACHING INTERNAL ERROR ON 404
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error getting post by id: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -54,6 +51,7 @@ def create_post(post_info: schemas.Create_post, db: Session = Depends(get_db), T
         
         res = {"post": new_post, "Ups": 0, "Downs": 0}
         followers = db.query(models.Followings).filter(models.Followings.followed_id==Token_Info.user_id).all()
+        #! Needs optimization HINT : batch insert to avoid multiple query operations
         for follower in followers:
             notification = models.Notification(user_id = follower.follower_id, message = f"{Token_Info.username} has made a post!")
             db.add(notification)
@@ -77,9 +75,14 @@ def update_post(id: int, update_info: schemas.Post_update, db: Session = Depends
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         if post_to_update.owner_id != Token_Info.user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-        for key in update_info.model_dump().keys():
-            if update_info.model_dump()[key] is not None:
-                setattr(post_to_update, key, update_info.model_dump()[key])
+        
+        #! Stored the update info in it's own dictionary to avoid calling model_dump()
+        
+        Temporary_dict =update_info.model_dump()
+        for key in Temporary_dict.keys():
+            if Temporary_dict[key] is not None:
+                # print("SUCCESS")
+                setattr(post_to_update, key, Temporary_dict[key])
         db.commit()
         db.refresh(post_to_update)
         return post_to_update
