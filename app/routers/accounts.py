@@ -25,7 +25,6 @@ def get_users(db: Session = Depends(get_db)):
 #? creating Users
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Public_UserInfo)
 def create_account(user: schemas.UserCreate, db: Session = Depends(get_db)):
-
     try:
         exist = db.query(models.User).filter(models.User.email == user.email).first()
         if exist is not None:
@@ -42,7 +41,6 @@ def create_account(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 #? Getting User By id
-    
 @router.get("/{id}", response_model=schemas.Private_UserInfo)
 def get_user(id: int, db: Session = Depends(get_db)):
 
@@ -57,7 +55,6 @@ def get_user(id: int, db: Session = Depends(get_db)):
 
 
 #? Updating a User
-    
 @router.put("/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Public_UserInfo)
 def update_user(id: int, user: schemas.UserUpdate, db: Session = Depends(get_db), Token_info: schemas.Token_data = Depends(ouath2.get_current_user)):
 
@@ -101,15 +98,3 @@ def delete_user(id: int, db: Session = Depends(get_db), Token_Info: schemas.Toke
         logger.error(f"Error deleting user: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
     
-
-#? Getting Users Notifications
-    
-@router.get("/notifications/mynotifications",response_model=List[schemas.Notification_out])
-def get_notifications(db : Session = Depends(get_db),Token_info : schemas.Token_data = Depends(ouath2.get_current_user)):
-    try:
-        notifications_query = db.query(models.Notification).filter(models.Notification.user_id==Token_info.user_id)
-        return notifications_query.all()
-    except Exception as e :
-        logger.error(f"Error Getting Notifications : {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

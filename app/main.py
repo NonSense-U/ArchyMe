@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from .routers import Follow, Reaction, Accounts,Posts,Auth
+from .routers.Profile import Notifications
 from fastapi.middleware.cors import CORSMiddleware
 
 origins  = ["*"]
@@ -19,7 +20,7 @@ app.include_router(Posts.router)
 app.include_router(Auth.router)
 app.include_router(Follow.router)
 app.include_router(Reaction.router)
-
+app.include_router(Notifications.router)
 
 @app.get("/")
 def Test():
