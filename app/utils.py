@@ -3,6 +3,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from . import models, schemas
 from .database import get_db
+from typing import List
 import logging  # Added logging for better debugging and tracking
 
 # Create a logger
@@ -54,3 +55,8 @@ def Count_Downs(post_id: int, db: Session) -> int:
     except Exception as e:
         logger.error(f"Error counting downs: {e}")
         raise
+
+def Send_Notifications(followers,Token_Info : schemas.Token_data ,action : str,db : Session):
+        notifications_list = list(map(lambda x :models.Notification (**{"user_id": x.follower_id ,"message" :f'{Token_Info.username} has made a {action} you can see it NOW <3 !'}),followers))
+        print(notifications_list)
+        db.add_all(notifications_list)

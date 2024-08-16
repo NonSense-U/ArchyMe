@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas, ouath2
-from ..utils import Count_Ups, Count_Downs
+from ..utils import Count_Ups, Count_Downs,Send_Notifications
 from typing import List
 import logging
 
@@ -51,11 +51,11 @@ def create_post(post_info: schemas.Create_post, db: Session = Depends(get_db), T
         
         res = {"post": new_post, "Ups": 0, "Downs": 0}
         followers = db.query(models.Followings).filter(models.Followings.followed_id==Token_Info.user_id).all()
-        #! Needs optimization HINT : batch insert to avoid multiple query operations
-        for follower in followers:
-            notification = models.Notification(user_id = follower.follower_id, message = f"{Token_Info.username} has made a post!")
-            db.add(notification)
 
+        #! Needs optimization HINT : batch insert to avoid multiple query operations
+        #? DONE >_<
+
+        Send_Notifications(followers,Token_Info,"post",db)
         db.commit()
         db.refresh(new_post)
         return res
