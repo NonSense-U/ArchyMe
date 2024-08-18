@@ -5,7 +5,6 @@ from .. import models, schemas, ouath2
 from typing import List
 import logging
 
-# Create a logger
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Follow"])
@@ -58,8 +57,6 @@ def get_followers(id: int, db: Session = Depends(get_db), Token_Info: schemas.To
     except Exception as e:
         logger.error(f"Error getting followers: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
-
-
 
 
 @router.get("/followings/{id}", response_model=List[schemas.Followings_out])

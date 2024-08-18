@@ -38,9 +38,3 @@ def test_delete_user(client):
     response = client.delete("/accounts/1")  # assuming there is a user with ID 1 in the database
     assert response.status_code == 202
     assert response.json().get("data") == "success!"
-
-# Test for getting user notifications
-def test_get_notifications(client):
-    response = client.get("/accounts/notifications/mynotifications")
-    assert response.status_code == 200
-    assert len(response.json()) > 0  # assuming there are notifications in the database

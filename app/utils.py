@@ -58,5 +58,4 @@ def Count_Downs(post_id: int, db: Session) -> int:
 
 def Send_Notifications(followers,Token_Info : schemas.Token_data ,action : str,db : Session):
         notifications_list = list(map(lambda x :models.Notification (**{"user_id": x.follower_id ,"message" :f'{Token_Info.username} has made a {action} you can see it NOW <3 !'}),followers))
-        print(notifications_list)
         db.add_all(notifications_list)
